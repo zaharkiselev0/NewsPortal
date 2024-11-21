@@ -1,0 +1,12 @@
+{% extends 'flatpages/default.html' %}
+
+{% load сustom_filters %}
+
+{% block title %}
+{{ post.title }}
+{% endblock title %}
+
+{% block content %}
+<h4>{{ post.date | date:'d E Y'}} {{ post.title | censor }}</h4>
+<p>{{ post.text | censor }}</p>
+{% endblock content %}
