@@ -9,4 +9,15 @@
 {% block content %}
 <h4>{{ post.date | date:'d E Y'}} {{ post.title | censor }}</h4>
 <p>{{ post.text | censor }}</p>
+<p>Автор: {{ post.puser.user.username }} </p>
+<hr>
+
+{% if perms.news_app.change_post %}
+    <a href="{% url 'post_update' pk=post.id %}">Изменить</a>
+{% endif %}
+
+{% if perms.news_app.delete_post %}
+    <a href="{% url 'post_delete' post.id %}">Удалить</a>
+{% endif %}
+
 {% endblock content %}

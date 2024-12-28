@@ -15,12 +15,8 @@ class Puser(models.Model):
             rating += author.post_set.aggregate(Sum('comment__rating'))['comment__rating__sum'] or 0
         self.rating = rating
 
-
-class Author(models.Model):
-    puser = models.OneToOneField(Puser, on_delete=models.CASCADE, primary_key=True)
-
     def __str__(self):
-        return self.puser.user.username
+        return self.user.username
 
 
 class Category(models.Model):
@@ -31,7 +27,7 @@ class Category(models.Model):
 
 
 class Post(models.Model):
-    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    puser = models.ForeignKey(Puser, on_delete=models.CASCADE)
     article = models.BooleanField()
     date = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=255)

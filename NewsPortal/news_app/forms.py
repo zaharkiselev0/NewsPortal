@@ -7,6 +7,6 @@ from django.core.exceptions import ValidationError
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['title', 'text', 'author', 'category']
-        labels = {'title': 'Заголовок', 'text': 'Текст', 'author': 'Автор(временно)', 'category': "Категория"}
+        fields = ['title', 'text', 'category']
+        labels = {'title': 'Заголовок', 'text': 'Текст', 'category': "Категория"}
 

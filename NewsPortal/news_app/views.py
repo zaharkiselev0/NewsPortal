@@ -2,9 +2,11 @@ from copy import deepcopy
 
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .models import Post
+from .models import Post, Puser
 from .forms import PostForm
 from django.urls import reverse_lazy
+
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 
 class PostList(ListView):
@@ -21,7 +23,7 @@ class PostDetail(DetailView):
     context_object_name = 'post'
 
 
-class NewCreate(CreateView):
+class NewCreate(LoginRequiredMixin, CreateView):
     model = Post
     template_name = 'post_edit.html'
     form_class = PostForm
@@ -29,10 +31,11 @@ class NewCreate(CreateView):
     def form_valid(self, form):
         new = form.save(commit=False)
         new.article = False
+        new.puser = self.request.user.puser
         return super().form_valid(form)
 
 
-class ArticleCreate(CreateView):
+class ArticleCreate(LoginRequiredMixin, CreateView):
     model = Post
     template_name = 'post_edit.html'
     form_class = PostForm
@@ -40,16 +43,19 @@ class ArticleCreate(CreateView):
     def form_valid(self, form):
         new = form.save(commit=False)
         new.article = True
+        new.puser = self.request.user.puser
         return super().form_valid(form)
 
 
-class PostUpdate(UpdateView):
+class PostUpdate(PermissionRequiredMixin, UpdateView):
+    permission_required = ('news_app.change_post',)
     form_class = PostForm
     model = Post
     template_name = 'post_edit.html'
 
 
-class PostDelete(DeleteView):
+class PostDelete(PermissionRequiredMixin, DeleteView):
+    permission_required = ('news_app.delete_post',)
     model = Post
     template_name = 'post_delete.html'
     success_url = reverse_lazy('post_list')
