@@ -1,0 +1,14 @@
+{% extends 'flatpages/default.html' %}
+
+{% block content %}
+<h4>{{ puser.user.username }}</h4>
+<p>Описание: {{ puser.description }}</p>
+<p>Рейтинг: {{ puser.rating }}</p>
+
+{% if request.user.is_authenticated%}
+    {% include 'elements/subscribe.html' %}
+{% endif %}
+
+<a href = "{% url 'user_posts' pk=puser.pk %}">Посты пользователя</a>
+
+{% endblock content %}

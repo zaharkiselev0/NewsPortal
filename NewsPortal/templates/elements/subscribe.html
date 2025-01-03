@@ -1,0 +1,9 @@
+<form method="post" action="{% url 'subscribe' %}">
+    {% csrf_token %}
+    <input type="hidden" name="sub_pk" value="{{ sub_pk }}" />
+    {% if subscribed %}
+        <button name="action" value="unsubscribe">Отписаться от автора</button>
+    {% else %}
+        <button name="action" value="subscribe">Подписаться на автора</button>
+    {% endif %}
+</form>

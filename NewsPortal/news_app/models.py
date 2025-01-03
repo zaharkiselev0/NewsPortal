@@ -7,6 +7,9 @@ from django.urls import reverse
 class Puser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     rating = models.IntegerField(default=0)
+    subscriptions = models.ManyToManyField('Puser', through='accounts.Subscriptions')
+    description = models.TextField(default='')
+    send_mail = models.BooleanField(default=True)
 
     def update_rating(self):
         rating = self.comment_set.exclude(post__author__puser=self).aggregate(Sum('rating'))['rating__sum'] or 0

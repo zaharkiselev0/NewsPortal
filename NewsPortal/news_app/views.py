@@ -22,6 +22,16 @@ class PostDetail(DetailView):
     template_name = 'post.html'
     context_object_name = 'post'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            puser = self.request.user.puser
+            sub_pk = context['post'].puser.pk
+            subscribed = puser.subscriptions.filter(pk=sub_pk).exists()
+            context['subscribed'] = subscribed
+            context['sub_pk'] = sub_pk
+        return context
+
 
 class NewCreate(LoginRequiredMixin, CreateView):
     model = Post
@@ -63,7 +73,7 @@ class PostDelete(PermissionRequiredMixin, DeleteView):
 
 def get_view(view_class, decorators):
     view = type('', view_class.__bases__, deepcopy(dict(view_class.__dict__)))
-    for foo, *args in decorators:
+    for foo, args in decorators.items():
         foo(view, *args)
     return view
 

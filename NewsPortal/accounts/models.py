@@ -1,3 +1,7 @@
 from django.db import models
+from news_app.models import Puser
 
-# Create your models here.
+
+class Subscriptions(models.Model):
+    follower = models.ForeignKey(Puser, on_delete=models.CASCADE, related_name='followers')
+    sub = models.ForeignKey(Puser, on_delete=models.CASCADE, related_name='subs')
