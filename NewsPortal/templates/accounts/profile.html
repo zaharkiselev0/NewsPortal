@@ -1,0 +1,39 @@
+{% extends 'flatpages/default.html' %}
+
+<hr>
+{% block content %}
+<form method="post" action="{% url 'change_user_info' %}">
+    {% csrf_token %}
+    {% if puser.send_mail %}
+        <p>Вы подписаны на еженедельную рассылку новых постов</p>
+        <button name="send_mail" value=False>Отказаться от рассылки</button>
+    {% else %}
+        <p>Вы не подписаны на еженедельную рассылку новых постов</p>
+        <button name="send_mail" value=True>Подписаться на рассылку</button>
+    {% endif %}
+</form>
+
+<hr>
+<form method="post" action="{% url 'change_user_info' %}">
+    {% csrf_token %}
+    <input type="text" name = "description" value="{{ puser.description }}"/>
+    <input type="submit"  value="Изменить описание"/>
+</form>
+
+<hr>
+<p>Мои подписки:</p>
+<p>
+    {% for sub in subs %}
+        <a href="{% url 'user' pk=sub.pk %}">{{ sub.user.username }}</a>
+    {% endfor %}
+</p>
+
+<hr>
+<p>Мои посты:</p>
+{% for post in posts %}
+    <h4><a href="/news/{{ post.pk }}"> {{ post.date | date:'d E Y'}} {{ post.title }}</a></h4>
+    <p>{{ post.text | truncatechars:20}}</p>
+{% endfor %}
+
+{% endblock content %}
+
