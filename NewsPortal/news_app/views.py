@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
 from .models import Post, Puser
 from .forms import PostForm
@@ -8,6 +8,11 @@ from django.urls import reverse_lazy
 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.http import HttpResponse
+
+from django.utils.translation import gettext as _
+from django.utils import timezone
+
+import pytz
 
 
 class PostList(ListView):
@@ -73,7 +78,7 @@ class PostDelete(PermissionRequiredMixin, DeleteView):
 
 
 def get_view(view_class, decorators):
-    view = type('', view_class.__bases__, deepcopy(dict(view_class.__dict__)))
+    view = type('', (view_class,), deepcopy(dict(view_class.__dict__)))
     for foo, args in decorators.items():
         foo(view, *args)
     return view

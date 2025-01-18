@@ -5,8 +5,9 @@ from news_app.models import User, Post
 from django.core.mail import send_mail
 
 from datetime import datetime, timedelta
-
+from .errors import MailError
 import time
+from django.core.cache import cache
 
 
 @shared_task(soft_time_limit=10, time_limit=15)
@@ -15,23 +16,23 @@ def mail_signed_up_task(user_id):
         user = User.objects.get(pk=user_id)
         subject = 'Вы успешно зарегестрировались на сайте!'
         message = f'Добро пожаловать, {user.username}!'
-        send_mail(subject, message, 'none', [user.email])
+        mail_success = send_mail(subject, message, 'none', [user.email])
+        if not mail_success:
+            raise MailError("Письмо не отправлено")
     except SoftTimeLimitExceeded:
         print('Письмо при регистрации не отправлено')
 
 
-# Работает, но адекватность под вопросом
-text_subject_numtask_dict = dict()
 @shared_task(soft_time_limit=10, time_limit=15)
 def post_created_mail_user_task(user_id, post_id):
-    text_subject_numtask = text_subject_numtask_dict[post_id]
+    text_subject_numtask = cache.get(post_id, None)
     subject = text_subject_numtask[0]
     text_content = text_subject_numtask[1]
     text_subject_numtask[2] -= 1
     user = User.objects.get(pk=user_id)
     send_mail(subject, text_content, 'none', [user.email])
     if not text_subject_numtask[2]:
-        text_subject_numtask_dict.pop(post_id)
+        cache.delete(post_id)
 
 
 @shared_task(soft_time_limit=10, time_limit=15)
@@ -45,7 +46,7 @@ def post_created_task(post_id):
         f'Пост: {post.title}\n'
         f'Ссылка на пост: http://127.0.0.1:8000{post.get_absolute_url()}'
     )
-    text_subject_numtask_dict[post_id] = [subject, text, len(users_id)]
+    cache.set(post_id, [subject, text, len(users_id)])
     for uid in users_id:
         post_created_mail_user_task.delay(uid, post_id)
 

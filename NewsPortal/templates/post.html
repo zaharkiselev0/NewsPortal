@@ -11,6 +11,7 @@
 <p>{{ post.text | censor }}</p>
 <p>Автор: <a href="{% url 'user' pk=post.puser.pk %}">{{ post.puser.user.username }}</a></p>
 
+
 {% if request.user.is_authenticated%}
     {% include 'elements/subscribe.html' %}
 {% endif %}

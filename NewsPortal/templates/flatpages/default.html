@@ -1,5 +1,9 @@
 <!DOCTYPE html>
+{% load i18n %}
+{% load cache %}
+{% get_current_language as LANGUAGE_CODE %}
 <html lang="en">
+    {% cache 60 head theme%}
     <head>
         {% load static %}
         <meta charset="utf-8" />
@@ -10,39 +14,56 @@
         <!-- Favicon-->
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
+        <style>
+        body {background-color: {% if theme == 'dark' %} darkcyan {% else %} powderblue {% endif %};}
+        </style>
     </head>
+    {% endcache %}
     <body>
         <!-- Responsive navbar-->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
        <div class="container">
+           {% cache 30 nav1 %}
            <button class="navbar-toggler" type="button" data-toggle="collapse"
                    data-target="#navbarResponsive"
                    aria-controls="navbarResponsive" aria-expanded="false"
                    aria-label="Toggle navigation">
                <span class="navbar-toggler-icon"></span>
            </button>
+           {% endcache %}
            <div class="collapse navbar-collapse" id="navbarResponsive">
                <ul class="navbar-nav ml-auto">
+                   {% cache 30 nav2 LANGUAGE_CODE %}
                    <li class="nav-item active">
-                       <a class="nav-link" href="/news">Главная</a>
+                       <a class="nav-link" href="/news">{% trans "Main" %}</a>
                    </li>
                    <li class="nav-item">
-                       <a class="nav-link" href="/news/news/">Новости</a>
+                       <a class="nav-link" href="/news/news/">{% trans "News" %}</a>
                    </li>
                    <li class="nav-item">
-                       <a class="nav-link" href="/news/articles/">Статьи</a>
+                       <a class="nav-link" href="/news/articles/">{% trans "Articles" %}</a>
                    </li>
                    <li class="nav-item">
-                       <a class="nav-link" href="/news/search/">Поиск</a>
+                       <a class="nav-link" href="/news/search/">{% trans "Search" %}</a>
+                   </li>
+                   {% endcache %}
+                   <li class="nav-item">
+                       {% include 'elements/lang.html'%}
                    </li>
                     {% if user.is_authenticated %}
                         <li class="nav-item"><a class="nav-link" href="/accounts/profile">{{ user.username }}</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/accounts/logout">Выход</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/news/news/create">Добавить новость</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/news/articles/create">Добавить статью</a></li>
-                    {% else %}
-                        <li class="nav-item"><a class="nav-link" href="/accounts/login">Вход</a></li>
+                   {% else %}
+                        <li class="nav-item"><a class="nav-link" href="/accounts/login">{% trans "Enter" %}</a></li>
+                   {% endif %}
+                   {% cache 30 nav3 LANGUAGE_CODE user.is_authenticated%}
+                   {% if user.is_authenticated %}
+                        <li class="nav-item"><a class="nav-link" href="/accounts/logout">{% trans "Exit" %}</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/news/news/create">{% trans "Add New" %}</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/news/articles/create">{% trans "Add Article" %}</a></li>
                     {% endif %}
+                    {% endcache %}
+
+
                </ul>
            </div>
        </div>

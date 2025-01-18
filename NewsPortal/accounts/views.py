@@ -1,10 +1,13 @@
 from django.shortcuts import render
+from django.template.response import TemplateResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_protect
 from .models import Subscriptions
 from news_app.models import Puser
 from django.http import HttpResponseRedirect
 from django.views.generic import DetailView
+import pytz
+from django.utils import timezone
 
 
 @login_required
@@ -28,17 +31,21 @@ def profile(request):
     puser = request.user.puser
     posts = puser.post_set.all()
     subs = Puser.objects.filter(subs__follower=puser)
-    return render(request, template_name='accounts/profile.html', context={'puser': puser, 'posts': posts, 'subs': subs})
+    return TemplateResponse(request, 'accounts/profile.html',
+                            context={'puser': puser, 'posts': posts, 'subs': subs,
+                                     'timezones': pytz.common_timezones,
+                                     'current_time': timezone.localtime(timezone.now())})
 
 
+change_attributes = ['description', 'send_mail']
 @login_required
 @csrf_protect
 def change_user_info(request):
     if request.method == 'POST':
         puser = request.user.puser
-        for attr_name, attr_value in request.POST.items():
-            if hasattr(puser, attr_name):
-                puser.__setattr__(attr_name, attr_value)
+        for attr_name in change_attributes:
+            if attr_name in request.POST:
+                puser.__setattr__(attr_name, request.POST.get(attr_name))
         puser.save()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -57,5 +64,3 @@ class UserDetail(DetailView):
             context['subscribed'] = subscribed
             context['sub_pk'] = sub_pk
         return context
-
-

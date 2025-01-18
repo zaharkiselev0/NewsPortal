@@ -2,6 +2,10 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.urls import reverse
+from django.core.cache import cache
+
+from django.utils.translation import gettext as _
+from django.utils.translation import pgettext_lazy # импортируем «ленивый» геттекст с подсказкой
 
 
 class Puser(models.Model):
@@ -23,7 +27,7 @@ class Puser(models.Model):
 
 
 class Category(models.Model):
-    category = models.CharField(max_length=64, unique=True)
+    category = models.CharField(max_length=64, unique=True, help_text=_('category'))
 
     def __str__(self):
         return self.category
@@ -50,6 +54,10 @@ class Post(models.Model):
     def get_absolute_url(self):
         return reverse('post_detail', args=[str(self.pk)])
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        cache.delete(f'Post-{self.pk}')
+
 
 class PostCategory(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
@@ -68,3 +76,5 @@ class Comment(models.Model):
 
     def dislike(self):
         self.rating -= 1
+
+

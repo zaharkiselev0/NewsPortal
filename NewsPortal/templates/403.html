@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+{% load cache %}
+{% cache 300 error_403 %}
 <html lang="ru">
 <head>
    <meta charset="UTF-8">
@@ -8,3 +10,4 @@
    Кажется, у Вас нет доступа к данной странице...
 </body>
 </html>
+{% endcache %}

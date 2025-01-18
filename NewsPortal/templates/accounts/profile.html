@@ -34,6 +34,10 @@
     <h4><a href="/news/{{ post.pk }}"> {{ post.date | date:'d E Y'}} {{ post.title }}</a></h4>
     <p>{{ post.text | truncatechars:20}}</p>
 {% endfor %}
+<hr>
+
+{% include 'elements/timezone.html' %}
+{{ current_time }} <!-- Отображаем время в выбранном часовом поясе  -->
 
 {% endblock content %}
 

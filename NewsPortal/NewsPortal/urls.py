@@ -16,10 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from .views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('news/', include('news_app.urls')),
     path("accounts/", include("accounts.urls")),
     path("accounts/", include("allauth.urls")),
+    path("timezone/", change_timezone, name='timezone'),
 ]
